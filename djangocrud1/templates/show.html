@@ -1,0 +1,22 @@
+<div>
+    <a href="/load_form/">Add</add>
+</div>
+<table border="1">
+    <tr>
+        <td>Id</td>
+        <td>Name</td>
+        <td>Contact</td>
+        <td>Actions</td>
+    </tr>
+    {% for i in employee %}
+    <tr>
+        <td>{{ i.eid }}</td>
+        <td>{{ i.ename }}</td>
+        <td>{{ i.econtact }}</td>
+        <td>
+            <a href="/edit/{{i.id}}">Edit</a>
+            <a href="/delete/{{i.id}}">Delete</a>
+        </td>
+    </tr>
+    {% endfor %}
+</table>

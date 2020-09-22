@@ -1,0 +1,582 @@
+{% extends 'app_admin/base.html' %}
+<!DOCTYPE html>
+{% block title %} <title> MumsBuzzar Admin </title> {% endblock %}
+{% block stylesheet %}
+{% load static %}
+<!-- <link rel="stylesheet" type="text/css" href="{% static 'admin_static/datatable/jquery.dataTables.min.css' %}"> -->
+<style>
+	table.dataTable thead .sorting, 
+	table.dataTable thead .sorting_asc, 
+	table.dataTable thead .sorting_desc {
+		background : none;
+	}
+	td,th{
+		padding: 10px 18px !important;
+		border-bottom: 0px !important;
+	}
+	table{
+		border-bottom: 0px !important;
+	}
+	.card-header{
+		background-color: rgba(0, 0, 0, 0) !important;
+    border-bottom: 0px solid rgba(0,0,0,.125) !important;
+	}
+</style>
+{% endblock %}
+{% block pagecontent %}
+{% load static %}
+<div id="content" class="main-content">
+    <div style="margin-left: 0;" class="page-wrapper p-10">
+	<div class="container-fluid">
+		<div style="margin: 20px auto;min-width: 100%;overflow-y: scroll;" class="card">
+			<div class="card-header p-10">
+				<label class="card-title color-themes pull-left m-b-0">Category Management</label>	
+
+			<!--	<a class="btn btn-danger btn-sm pull-right" style="" data-toggle="modal" href="" onclick="deleteClient()">Delete</a>-->
+
+				
+				<div class="d-flex justify-content-sm-end justify-content-center">      
+					<!--<a class="btn btn-info btn-sm pull-right m-r-5" data-toggle="modal" href="#modalClient" onclick="">New Client</a> -->
+                    <a class="btn btn-success mb-2" data-toggle="modal" href="#modalClient" onclick="">Add Category</a>
+                        </br>
+                        </br>
+                </div>
+				<!--<a class="btn btn-info btn-sm pull-right m-r-5" data-toggle="modal" href="#modalColumns" onclick=""><i class="fa fa-gear"></i></a>-->
+
+			</div>
+			<div class="card-body">
+			<table style="min-width: -webkit-fill-available !important;" class="table table-hover dataTable" id="ChecklistTable" cellspacing="0">
+					<thead>
+						<tr>
+							<th><input type="checkbox" id="checkAll" class="form-control" style="width: 20px;" onchange="checkAll();"></th>
+							<th>Name</th>
+							<th>Website/URL</th>
+							<th>PhoneNo</th>
+							<th>Address-1</th>
+							<th>Address-2</th>
+							<th>City</th>
+							<th>State</th>
+							<th>Zip Code</th>
+							<th>Created Date</th>
+							<th>Action</th>
+						</tr>
+					</thead>
+					<tbody>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+    </div>
+</div>
+<div class="modal fade" id="modalClient" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" style="padding-left: 0px;" aria-hidden="true">
+	<div style="width: 100%;" class="modal-dialog modal-lg">
+		<div style="pointer-events: visible;" class="container-fluid">
+			<div class="card">
+				<div class="card-header">
+					<lebel class="card-title color-themes"  id="ContactFormHeading">Add Client</lebel>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close" onclick="clearModal();" onclick="clearModal();" id="modalClientCloseBtn">
+						<i class="fa fa-close"></i>
+					</button>
+				</div>
+					<div class="card-content">
+						<div class="card-body">
+							<div class="form-body">
+								<div class="row">
+									<div class="col-md-6">
+										<label>Name : </label>
+										<input type="text" id="name" class="form-control" placeholder="Name" onkeyup="validateName();">
+										<p id="nameErr" style="color: red;">&nbsp;</p>
+									</div>
+									
+									<div class="col-md-6">
+										<label>Website/URL : </label>
+										<input type="email" id="email" class="form-control datepicker" placeholder="Website/URL" onkeyup="validateEmail();">
+										<p id="emailErr" style="color: red;">&nbsp;</p>
+									</div>
+									<div class="col-md-6">
+										<label>Mobile Number : </label>
+										<input type="text" id="phone_number" class="form-control" placeholder="Mobile Number" onkeyup="validatePhoneNumber();">
+										<p id="phone_numberErr" style="color: red;">&nbsp;</p>
+									</div>
+									<div class="col-md-6">
+										<label>Address 1 : </label>
+										<input type="text" id="address_1" class="form-control" placeholder="Address 1" onkeyup="validateAddress1();">
+										<p id="address_1Err" style="color: red;">&nbsp;</p>
+									</div>
+									<div class="col-md-6">
+										<label>Address 2 : </label>
+										<input type="text" id="address_2" class="form-control" placeholder="Address 2">
+										<p id="address_2Err" style="color: red;">&nbsp;</p>
+									</div>
+									<div class="col-md-6">
+										<label>City : </label>
+										<input type="text" id="city" class="form-control" placeholder="City" onkeyup="validateCity();">
+										<p id="cityErr" style="color: red;">&nbsp;</p>
+									</div>
+									<div class="col-md-6">
+										<label>State : </label>
+										<!-- <input type="text" id="state" class="form-control" placeholder="State" onkeyup="validateState();"> -->
+										<select class="form-control" id="state" data-placeholder="Select state..." onchange="validateState();">
+											<option value=""></option>
+											{% for st in data.states %}
+											<option value="{{st.id}}">{{st.name}}</option>
+											{% endfor %}
+										</select>
+										<p id="stateErr" style="color: red;">&nbsp;</p>
+									</div>
+									<div class="col-md-6">
+										<label>Zipcode : </label>
+										<input type="text" id="zipcode" class="form-control" placeholder="Zipcode" onkeyup="validateZipCode();">
+										<p id="zipcodeErr" style="color: red;">&nbsp;</p>
+									</div>
+								</div>
+							</div>
+							<div class="form-actions">
+								<input type="hidden" value="" id="clientid">
+								<button type="button" class="btn btn-success btn-sm m-b-10 m-l-5 m-t-10 pull-right" onclick="save();">Submit</button>
+							</div>
+						</div>
+					</div>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="modal fade" id="modalDelete" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" style="padding-left: 0px;" aria-hidden="true">
+	<div style="width: 100%;" class="modal-dialog modal-lg">
+		<div style="pointer-events: visible;" class="container-fluid">
+			<div class="card">
+				<div class="card-body">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close" onclick="clearDeleteModal();" id="modalDeleteCloseBtn">
+						<i class="fa fa-close"></i>
+					</button>
+					<div class="card-content">
+						<div class="card-body">
+							<div class="form-body">
+								<div class="row">
+									<div class="col-md-12">
+										<div class="form-group">
+											<h3 class="card-title color-themes"  id="DeleteFormHeading"></h3>
+										</div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="col-md-6">
+										<button type="button" class="btn btn-danger btn-sm m-b-10 m-l-5 m-t-10 pull-right" onclick="deleteItem();">Delete</button>
+									</div>
+									<div class="col-md-6">
+										<button type="button" class="btn btn-brd btn-sm m-b-10 m-l-5 m-t-10 pull-left" data-dismiss="modal" onclick="clearDeleteModal();">Cancel</button>
+									</div>
+								</div>
+								<div class="row">
+									<input type="hidden" id="uIdDelete" value="">
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="modal fade" id="modalColumns" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" style="padding-left: 0px;" aria-hidden="true">
+	<div style="width: 100%;" class="modal-dialog modal-lg">
+		<div style="pointer-events: visible;" class="container-fluid">
+			<div class="card">
+				<div class="card-header">
+						<lebel class="card-title color-themes">Columns Settings</lebel>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<i class="fa fa-close"></i>
+					</button>
+				</div>
+					<div class="card-content">
+						<div class="card-body">
+							<div class="form-body">
+								<div class="row">
+									<div class="col-md-12">
+										<table class="table">
+											<tbody>
+												<tr>
+													<td><input type="checkbox" class="form-control" style="width: 20px;" id="check1" onchange="toggleColumn(1,this);" checked></td>
+													<td>Name</td>
+													<td><input type="checkbox" class="form-control" style="width: 20px;" id="check2" onchange="toggleColumn(2,this);" checked></td>
+													<td>Website/URL</td>
+												</tr>
+												<tr>
+													<td><input type="checkbox" class="form-control" style="width: 20px;" id="check3" onchange="toggleColumn(3,this);" checked></td>
+													<td>PhoneNo</td>
+													<td><input type="checkbox" class="form-control" style="width: 20px;" id="check4" onchange="toggleColumn(4,this);"></td>
+													<td>Address-1</td>
+												</tr>
+												<tr>
+													<td><input type="checkbox" class="form-control" style="width: 20px;" id="check5" onchange="toggleColumn(5,this);"></td>
+													<td>Address-2</td>
+													<td><input type="checkbox" class="form-control" style="width: 20px;" id="check6" onchange="toggleColumn(6,this);" checked></td>
+													<td>City</td>
+												</tr>
+												<tr>
+													<td><input type="checkbox" class="form-control" style="width: 20px;" id="check7" onchange="toggleColumn(7,this);" checked></td>
+													<td>State</td>
+													<td><input type="checkbox" class="form-control" style="width: 20px;" id="check8" onchange="toggleColumn(8,this);"></td>
+													<td>Zip Code</td>
+												</tr>
+												<tr>
+													<td><input type="checkbox" class="form-control" style="width: 20px;" id="check9" onchange="toggleColumn(9,this);"></td>
+													<td>Created Date</td>
+												</tr>
+											</tbody>
+										</table>
+									</div>
+								</div>
+							</div>
+							<div class="form-actions">
+							</div>
+						</div>
+					</div>
+			</div>
+		</div>
+	</div>
+</div>
+{% endblock %}
+{% block javascript %}
+{% load static %}
+<!-- <script src="{% static 'admin_static/datatable/jquery.dataTables.min.js' %}"></script> -->
+
+<script type="text/javascript">
+/*	var table;
+	var aaData = [];
+	var hiddenColumns = [ 4,5,8,9 ];
+	$(document).ready(function(){
+		if (typeof(Storage) !== "undefined"){
+			for (var i = 1; i < 10; i++) {
+				var clntlist = localStorage.getItem("clntlist"+i);
+				if (clntlist === null) {
+					var index = hiddenColumns.indexOf(i);
+					if (index > -1) {
+						localStorage.setItem("clntlist"+i,"false");
+						$("#check"+i).prop("checked",false);
+					}else{
+						localStorage.setItem("clntlist"+i,"true");
+						$("#check"+i).prop("checked",true);
+					}
+				}else{
+					if (clntlist == "false") {
+						$("#check"+i).prop("checked",false);
+						hiddenColumns.push(i);
+					}else{
+						$("#check"+i).prop("checked",true);
+						var index = hiddenColumns.indexOf(i);
+						if (index > -1) {
+							hiddenColumns.splice(index, 1);
+						}
+					}
+				}
+			}
+		}
+		table = $('#ChecklistTable').DataTable( {
+			"processing": true,
+			"serverSide": true,
+			"ordering": true,
+			"lengthMenu": [[10, 25, 50, 100, 200, 300, 500, -1], [10, 25, 50, 100, 200, 300, 500, "All"]],
+			'columnDefs': [ {
+				'targets': [0,10],
+				'orderable': false,
+			},{
+				"targets": hiddenColumns,
+				"visible": false
+			}],
+			"order": [[ 1, "asc" ]],
+			"sAjaxDataProp": "data.inner",
+			"ajax": {
+				"url": ,
+				"type": "POST",
+				"data": function ( d ) {
+					d.action="list";
+					var backEndColumnNames = ["","nm","em","phone_number","add1","add2","cty","st","zipcode","crDt",""];
+					var orderDir = "";
+					if (d.order[0].dir == "desc") {
+						orderDir = "-";
+					}
+					d.order_by=orderDir+backEndColumnNames[d.order[0].column];
+				},
+				dataSrc: function (json) {
+					aaData = json.aaData;
+					for (var i = 0; i < json.aaData.length; i++) {
+						json.aaData[i].checkInput = '<input id="checkInput'+(i+1)+'" type="checkbox" class="form-control checkInput" style="width: 20px;" value="'+json.aaData[i].id+'">';
+						json.aaData[i].action = '<button title="Edit" class="btn btn-sm btn-info" onclick="getClientDetails('+"'"+json.aaData[i].id+"'"+')"><i class="fa fa-pencil"></i></button>'
+					}
+					return json.aaData;
+				}
+			},
+			"columns": [
+			{"data": "checkInput" },
+			{ "data": "name" },
+			{ "data": "email" },
+			{ "data": "phone_number" },
+			{ "data": "address_1" },
+			{ "data": "address_2" },
+			{ "data": "city" },
+			{ "data": "state" },
+			{ "data": "zipcode" },
+			{ "data": "createdtime" },
+			{ "data": "action" },
+			],
+		} );
+		$('div.dataTables_filter input').attr('placeholder', 'Search');
+		$('div.dataTables_filter input').attr('style', 'font-size:15px');
+		applyChosen();
+	});
+	
+	function applyChosen(){
+		$('#state').chosen('destroy').chosen();
+	}
+
+	function clearModal(){
+		$("#email").val("");
+		$("#emailErr").html("&nbsp;");
+		$("#phone_number").val("");
+		$("#phone_numberErr").html("&nbsp;");
+		$("#name").val("");
+		$("#nameErr").html("&nbsp;");
+		$("#address_1").val("");
+		$("#address_1Err").html("&nbsp;");
+		$("#address_2").val("");
+		$("#address_2Err").html("&nbsp;");
+		$("#city").val("");
+		$("#cityErr").html("&nbsp;");
+		$("#state").val("");
+		$("#stateErr").html("&nbsp;");
+		$("#zipcode").val("");
+		$("#zipcodeErr").html("&nbsp;");
+		$("#clientid").val("");
+		$("#action").val("create");
+		$('#ContactFormHeading').html("Add Client");
+		applyChosen();
+	}
+
+
+	function validateEmail() {
+		var email = $("#email").val();
+		if (email == "") {
+			**toastr.error("Please enter email",'Attention',{"positionClass": "toast-bottom-full-width" });**
+			$("#emailErr").html("Please enter email");
+			$("#email").focus();
+			return false;
+		}else{
+			$("#emailErr").html("&nbsp;");
+			return true;
+		}
+	}
+
+	function validatePhoneNumber() {
+		var phone_number = $("#phone_number").val();
+		if (phone_number == "") {
+			**toastr.error("Please enter phone number",'Attention',{"positionClass": "toast-bottom-full-width" });**
+			$("#phone_numberErr").html("Please enter phone number");
+			$("#phone_number").focus();
+			return false;
+		}else{
+			$("#phone_numberErr").html("&nbsp;");
+			return true;
+		}
+	}
+
+	function validateName() {
+		var name = $("#name").val();
+		if (name == "") {
+			**toastr.error("Please enter first name",'Attention',{"positionClass": "toast-bottom-full-width" });**
+			$("#nameErr").html("Please enter name");
+			$("#name").focus();
+			return false;
+		}else{
+			$("#nameErr").html("&nbsp;");
+			return true;
+		}
+	}
+
+	function validateAddress1() {
+		var address_1 = $("#address_1").val();
+		if (address_1 == "") {
+			**toastr.error("Please enter address 1",'Attention',{"positionClass": "toast-bottom-full-width" });**
+			$("#address_1Err").html("Please enter address 1");
+			$("#address_1").focus();
+			return false;
+		}else{
+			$("#address_1Err").html("&nbsp;");
+			return true;
+		}
+	}
+
+	function validateCity() {
+		var city = $("#city").val();
+		if (city == "") {
+			**toastr.error("Please enter city",'Attention',{"positionClass": "toast-bottom-full-width" });**
+			$("#cityErr").html("Please enter city");
+			$("#city").focus();
+			return false;
+		}else{
+			$("#cityErr").html("&nbsp;");
+			return true;
+		}
+	}
+
+	function validateState() {
+		var state = $("#state").val();
+		if (state == "") {
+			**toastr.error("Please enter state",'Attention',{"positionClass": "toast-bottom-full-width" });**
+			$("#stateErr").html("Please select state");
+			$("#state").focus();
+			return false;
+		}else{
+			$("#stateErr").html("&nbsp;");
+			return true;
+		}
+	}
+
+	function validateZipCode() {
+		var zipcode = $("#zipcode").val();
+		if (zipcode == "") {
+			**toastr.error("Please enter zipcode",'Attention',{"positionClass": "toast-bottom-full-width" });**
+			$("#zipcodeErr").html("Please enter zipcode");
+			$("#zipcode").focus();
+			return false;
+		}else{
+			$("#zipcodeErr").html("&nbsp;");
+			return true;
+		}
+	}
+
+	function save(){
+		var email = $("#email").val();
+		var phone_number = $("#phone_number").val();
+		var name = $("#name").val();
+		var address_1 = $("#address_1").val();
+		var address_2 = $("#address_2").val();
+		var city = $("#city").val();
+		var state = $("#state").val();
+		var zipcode = $("#zipcode").val();
+		var clientid = $("#clientid").val();
+		var action="create";
+
+		var isValid = validateName() && validateEmail() && validatePhoneNumber() && validateAddress1() && validateCity() && validateState() && validateZipCode();
+		if (!isValid) {
+			return false;
+		}
+		var data = new FormData();
+		data.append('email', email);
+		data.append('phone_number', phone_number);
+		data.append('name', name);
+		data.append('address_1', address_1);
+		data.append('address_2', address_2);
+		data.append('city', city);
+		data.append('state', state);
+		data.append('zipcode', zipcode);
+		data.append('id', clientid);
+		data.append('action', action);
+		$.ajax({
+			url: ,
+			data: data,
+			cache: false,
+			contentType: false,
+			processData: false,
+			type:'POST',
+			success: function (data) {
+				if(data.status=='success'){
+					$("#modalClientCloseBtn")[0].click();
+					table.ajax.reload();
+					toastr.success("Saved successfully",'Success',{"positionClass": "toast-bottom-full-width" });
+				}
+				else{
+					toastr.error(data.error,'Attention',{"positionClass": "toast-bottom-full-width" });
+				}
+			}
+		});
+	}
+	function checkAll() {
+		var checked = $("#checkAll").prop("checked");
+		var itemCount = aaData.length;
+		for (var i = 1; i <= itemCount; i++) {
+			$("#checkInput"+i).prop("checked",checked);
+		}
+	}
+	function deleteClient()
+	{
+		var itemCount = aaData.length;
+		var conArr = []
+		for (var i = 1; i <= itemCount; i++) {
+			if($("#checkInput"+i).prop("checked")){
+				conArr.push($("#checkInput"+i).val());
+			}
+		}
+		var data = new FormData();
+		data.append('conArr', JSON.stringify(conArr));
+		data.append('action','delete')
+		$.ajax({
+			url: ",
+			data: data,
+			cache: false,
+			contentType: false,
+			processData: false,
+			type:'POST',
+			success: function (data){
+				if(data.Status=='Success'){
+					toastr.success('Clients deleted successfully !','Success',{"positionClass": "toast-bottom-full-width",timeOut: 5000,"closeButton": true,"debug": false,"newestOnTop": true,"progressBar": true,"preventDuplicates": true,"onclick": null,"showDuration": "300","hideDuration": "1000","extendedTimeOut": "1000","showEasing": "swing","hideEasing": "linear","showMethod": "fadeIn","hideMethod": "fadeOut","tapToDismiss": false})
+					table.ajax.reload();
+				}else{
+					toastr.error(data.error,'Attention',{"positionClass": "toast-bottom-full-width" });
+				}
+			}
+		});
+		console.log(conArr);
+	}
+	function getClientDetails(id)
+	{
+		var data = new FormData();
+		data.append('id', id);
+		data.append('action', "viewById");
+		$.ajax({
+			url: ,
+			data: data,
+			cache: false,
+			contentType: false,
+			processData: false,
+			type:'POST',
+			success: function (data) {
+				if(data.Status=='Success'){
+					$("#clientid").val(data.obj.id);
+					$("#name").val(data.obj.name);
+					$("#address_1").val(data.obj.address1);
+					$("#address_2").val(data.obj.address2);
+					$("#city").val(data.obj.city);
+					$("#phone_number").val(data.obj.phone_number);
+					$("#email").val(data.obj.email);
+					$("#state").val(data.obj.state);
+					if(data.obj.state == null && data.obj.prevState != null){
+						$("#state").append('<option value="" selected>'+data.obj.prevState+'</option>');
+					}
+					$("#zipcode").val(data.obj.zipcode);
+					$("#action").val("edit");
+					$("#ContactFormHeading").html("Edit Client");
+					$('#modalClient').modal('show');
+					applyChosen();
+				}
+				else{
+					toastr.error(data.error,'Attention',{"positionClass": "toast-bottom-full-width" });
+				}
+			}
+		});
+	}
+
+	function toggleColumn(num,checkbox) {
+		var checked = $(checkbox).prop("checked");
+		table.column(num).visible(checked);
+		if (typeof(Storage) !== "undefined"){
+			if (checked == true) {
+				localStorage.setItem("clntlist"+num,"true");
+			} else {
+				localStorage.setItem("clntlist"+num,"false");
+			}
+		}
+	} */
+</script>
+{% endblock %}

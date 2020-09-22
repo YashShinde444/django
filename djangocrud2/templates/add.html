@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="row">
+<div class="col-sm-4"></div>
+<div class="col-sm-4">
+<h2 class="text-center alert alert-info">Add new student</h2>
+<a class="btn-sm text-center alert btn-info" href="/show">Back</a><br><br>
+<form method="POST" action="/add/">
+{% csrf_token %}
+    <label>Name</label>
+    <div>{{form.ename}}</div>
+    <label>Email</label>
+    <div>{{form.email}}</div>
+    <label>Contact</label>
+    <div>{{form.econtact}}</div>
+    <button class="alert alert-success" type="submit">Add</button>
+</form>
+</div>
+<div class="col-sm-4"></div>
+{% endblock content %}

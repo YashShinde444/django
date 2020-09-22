@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% block body %}
+{% load static %}
+	<!-- End Header Area -->
+
+	<!-- start banner Area -->
+	<section class="banner-area">
+		<div class="container">
+			<div class="row fullscreen align-items-center justify-content-start">
+				<div class="col-lg-12">
+					<div class="active-banner-slider owl-carousel">
+						<!-- single-slide -->
+						<div class="row single-slide align-items-center d-flex">
+							<div class="col-lg-12 col-md-12">
+								<div class="banner-content">
+									<!-- <h1>Nike New <br>Collection!</h1> -->
+									<!-- <img style="width: 80%;margin: 30px 0;" src="img/banner/mum.png"> -->
+									<img style="width: 80%;margin: 30px 0;" src="{% static 'img/banner/mum.png' %}">
+									<h2 style="color: #ffffff;font-weight: 600;padding: 0 15px;">A Community of Entrepreneurial Mums In Dubai.<br>Join The Hive, Be A <a style="color: #FFE400;"><u>Seller</u></a></h2>
+									<div style="margin-left:15px;" class="add-bag d-flex align-items-center">
+										<a class="" href=""><img style="width: 40px;margin-right: 25px;" src="{% static 'img/facebook.png' %}" /></a>
+										<a class="" href=""><img style="width: 40px;margin-right: 25px;" src="{% static 'img/twitter.png' %}" /></a>
+										<a class="" href=""><img style="width: 40px;margin-right: 25px;" src="{% static 'img/instagram.png' %}" /></a>
+										
+									</div>
+								</div>
+							</div>
+							<!-- <div class="col-lg-7">
+								<div class="banner-img">
+									<img class="img-fluid" src="img/banner/banner-img.png" alt="">
+								</div>
+							</div> -->
+						</div>
+						<!-- single-slide -->
+						
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+	<!-- End banner Area -->
+{% endblock %}
+
+	
