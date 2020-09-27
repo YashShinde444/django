@@ -43,7 +43,7 @@
                     <th scope="col">Action</th>
                 </tr>
                 </thead>
-                <tbody>
+                <tbody id="tbody">
                 {% for emp in employee %}
                 <tr>
                     <td>{{emp.ename}}</td>
@@ -60,6 +60,7 @@
 <script>
 $(document).ready(function(){
     $("#add").click(function(){
+        output="";
         name=$("#ename").val();
         email=$("#email").val();
         contact=$("#econtact").val();
@@ -69,9 +70,22 @@ $(document).ready(function(){
             data:{name:name,email:email,contact:contact,csrfmiddlewaretoken:csrfmiddlewaretoken},
             type:'POST',
             success:function(data){
-                $("#showtable").append('<tr><td>'+data.name+'</td><td>'+data.email+'</td><td>'+data.contact+'</td><td><a  class="btn btn-warning" href="/edit/'+data.id+'">Edit</a><a class="btn btn-danger" href="/delete/'+data.id+'">Delete</a></td></tr>');
-                alert(data.id);
-                $('#myModal').modal('hide');
+                x=data.employee;
+                /*for(i=0;i<2;i++)
+                {
+                    alert(x[i].ename);
+                }*/
+                   
+                    for(i=0;i<x.length;i++)
+                    {
+                        output += '<tr><td>'+x[i].ename+'</td><td>'+x[i].email+'</td><td>'+x[i].econtact+'</td><td><a  class="btn btn-warning" href="/edit/'+x[i].id+'">Edit</a><a class="btn btn-danger" href="/delete/'+x[i].id+'">Delete</a></td></tr>';
+                    }
+                    $('#tbody').html(output);
+                    $('#myModal').modal('hide');
+                     $("#showtable").load(window.location + " #showtable");
+                
+                //output+='<tr><td>'+data.name+'</td><td>'+data.email+'</td><td>'+data.contact+'</td><td><a  class="btn btn-warning" href="/edit/'+data.id+'">Edit</a><a class="btn btn-danger" href="/delete/'+data.id+'">Delete</a></td></tr>';
+               
             }
         })
     })

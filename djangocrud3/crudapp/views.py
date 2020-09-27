@@ -7,6 +7,7 @@ from .forms import EmployeeForm
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
+from django.core import serializers
 
 # Create your views here.
 def load_form(request):
@@ -36,7 +37,12 @@ def addmodal(request):
 		response_data['email'] = email
 		response_data['contact'] = contact
 		#return HttpResponse("Createde")
-		return JsonResponse(response_data)
+		#employee = serializers.serialize('json',Employee.objects.all())-Wrong method
+		#employee = list(Employee.objects.values('ename','email','econtact'))-Right
+		employee = list(Employee.objects.values_list('id','ename','email','econtact'))
+		#employee = Employee.objects.all()-Wrong method
+		#employee = list(Employee.objects.all())
+		return JsonResponse({'employee':employee})
 
 def show(request):
     employee = Employee.objects.all()
